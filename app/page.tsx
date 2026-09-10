@@ -10,22 +10,25 @@ async function getDatosEconomicos() {
       LEFT JOIN categorias_economicas c ON m.categoria_id = c.id
       ORDER BY m.fecha DESC
     `;
+    const categorias: any = await db`SELECT id, nombre FROM categorias_economicas ORDER BY nombre ASC`;
 
     return {
       balance: saldos[0] || { total_ingresos: 0, total_egresos: 0, saldo: 0 },
-      movimientos: movimientos || []
+      movimientos: movimientos || [],
+      categorias: categorias || []
     };
   } catch (error) {
     console.error('Error al obtener datos económicos:', error);
     return {
       balance: { total_ingresos: 0, total_egresos: 0, saldo: 0 },
-      movimientos: []
+      movimientos: [],
+      categorias: []
     };
   }
 }
 
 export default async function Home() {
-  const { balance, movimientos } = await getDatosEconomicos();
+  const { balance, movimientos, categorias } = await getDatosEconomicos();
 
   return (
     <main className="container py-4">
@@ -62,6 +65,21 @@ export default async function Home() {
                   </select>
                 </div>
 
+                {/* SELECT DE CATEGORÍA */}
+                <div className="mb-3">
+                  <label htmlFor="categoria_id" className="form-label fw-bold">
+                    Categoría
+                  </label>
+                  <select className="form-select" id="categoria_id" name="categoria_id" required>
+                    <option value="">Seleccionar categoría...</option>
+                    {categorias.map((cat: any) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div className="mb-3">
                   <label htmlFor="descripcion" className="form-label fw-bold">
                     Concepto / Detalle
@@ -76,6 +94,7 @@ export default async function Home() {
                   />
                 </div>
 
+                {/* INPUT MONTO CON BLOQUEO DE NEGATIVOS Y 'E' */}
                 <div className="mb-3">
                   <label htmlFor="monto" className="form-label fw-bold">
                     Monto ($)
@@ -83,10 +102,17 @@ export default async function Home() {
                   <input
                     type="number"
                     step="0.01"
+                    min="0.01"
+                    inputMode="decimal"
                     className="form-control"
                     id="monto"
                     name="monto"
                     placeholder="0.00"
+                    onKeyDown={(e) => {
+                      if (['e', 'E', '-', '+'].includes(e.key)) {
+                        e.preventDefault();
+                      }
+                    }}
                     required
                   />
                 </div>
