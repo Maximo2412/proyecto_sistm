@@ -108,11 +108,6 @@ export default async function Home() {
                     id="monto"
                     name="monto"
                     placeholder="0.00"
-                    onKeyDown={(e) => {
-                      if (['e', 'E', '-', '+'].includes(e.key)) {
-                        e.preventDefault();
-                      }
-                    }}
                     required
                   />
                 </div>
@@ -161,8 +156,8 @@ export default async function Home() {
                     ) : (
                       movimientos.map((m: any) => {
                         const esIngreso = m.tipo?.toUpperCase() === 'INGRESO';
-                        const fechaFormatted = m.fecha 
-                          ? new Date(m.fecha).toLocaleDateString('es-AR', { timeZone: 'UTC' }) 
+                        const fechaFormatted = m.fecha
+                          ? new Date(m.fecha).toLocaleDateString('es-AR', { timeZone: 'UTC' })
                           : '-';
 
                         return (
@@ -176,19 +171,17 @@ export default async function Home() {
                             </td>
                             <td>
                               <span
-                                className={`badge ${
-                                  esIngreso
+                                className={`badge ${esIngreso
                                     ? 'bg-success-subtle text-success border border-success-subtle'
                                     : 'bg-danger-subtle text-danger border border-danger-subtle'
-                                }`}
+                                  }`}
                               >
                                 {m.tipo}
                               </span>
                             </td>
                             <td
-                              className={`text-end pe-3 fw-bold ${
-                                esIngreso ? 'text-success' : 'text-danger'
-                              }`}
+                              className={`text-end pe-3 fw-bold ${esIngreso ? 'text-success' : 'text-danger'
+                                }`}
                             >
                               {esIngreso ? '+' : '-'}$
                               {Number(m.monto).toLocaleString('es-AR', {
